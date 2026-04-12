@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:gifza/themes/theme.dart';
 import 'package:gifza/widgets/appbar.dart';
+import 'package:gifza/providers/screenProvider.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+        providers: [ChangeNotifierProvider(create: (_) => ScreenProvider())],
+        child: MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final Widget currentScreen = context.watch<ScreenProvider>().currentScreen;
     return MaterialApp(
         title: 'Gifza',
         theme: theme,
@@ -20,6 +26,7 @@ class MyApp extends StatelessWidget {
             child: GfizaAppBar(),
             preferredSize: Size.fromHeight(200),
           ),
+          body: currentScreen,
         ));
   }
 }
