@@ -12,15 +12,18 @@ class FilterPill extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(horizontal: 30),
       height: 50,
-      width: 190,
       decoration: BoxDecoration(
           color: Color(0xFF141f38), borderRadius: BorderRadius.circular(50)),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           filterIcon,
+          SizedBox(
+            width: 10,
+          ),
           Text(filterText),
         ],
       ),
