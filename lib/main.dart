@@ -23,8 +23,8 @@ class MyApp extends StatelessWidget {
         theme: theme,
         home: Scaffold(
           appBar: PreferredSize(
-            child: GfizaAppBar(),
-            preferredSize: Size.fromHeight(200),
+            preferredSize: Size.fromHeight(70),
+            child: GifzaAppBar(),
           ),
           body: currentScreen,
         ));
