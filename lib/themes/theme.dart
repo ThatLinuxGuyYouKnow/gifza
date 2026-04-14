@@ -4,10 +4,11 @@ const _kDefaultBodyStyle =
     TextStyle(color: Colors.white, fontFamily: 'Vietnam');
 const _kHeaderStyle = TextStyle(color: Colors.white, fontFamily: 'Jakarta');
 
-const _primaryColour = Color.fromARGB(255, 187, 0, 255);
-const _secondaryColour = Color.fromARGB(248, 55, 255, 20);
-const _tertiaryColour = Color.fromARGB(255, 255, 0, 123);
-const _backgroundColor = Color.fromARGB(255, 15, 23, 42);
+const _primaryColour = Color.fromARGB(255, 215, 121, 255);
+const _secondaryColour = Color(0xFF39FF14);
+const _tertiaryColour = Color(0XFFFF007A);
+const _backgroundColor = Color(0xFF0F172A);
+const neutralColor = Color(0xFF141f38);
 
 final theme = ThemeData(
   colorScheme: ColorScheme.dark(
@@ -15,14 +16,19 @@ final theme = ThemeData(
       primary: _primaryColour,
       secondary: _secondaryColour,
       onSecondary: Colors.white,
+      tertiary: _tertiaryColour,
+      onTertiary: Colors.white,
       surface: _backgroundColor,
       onSurface: Colors.white),
   scaffoldBackgroundColor: _backgroundColor,
   textTheme: TextTheme(
-      bodyMedium: _kDefaultBodyStyle.copyWith(
-          fontSize: 15, fontWeight: FontWeight.w400),
-      titleMedium: _kHeaderStyle.copyWith(
-        fontSize: 15,
-        fontWeight: FontWeight.w500,
-      )),
+    bodyMedium:
+        _kDefaultBodyStyle.copyWith(fontSize: 15, fontWeight: FontWeight.w400),
+    titleMedium: _kHeaderStyle.copyWith(
+      color: _primaryColour,
+      fontSize: 30,
+      fontStyle: FontStyle.italic,
+      fontWeight: FontWeight.w700,
+    ),
+  ),
 );
