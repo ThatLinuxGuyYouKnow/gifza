@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class HeaderTexts extends StatelessWidget {
-  HeaderTexts({super.key});
+class HomeScreenHeader extends StatelessWidget {
+  HomeScreenHeader({super.key});
 
   Widget build(BuildContext context) {
     return Container(
@@ -40,5 +40,13 @@ class HeaderTexts extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class SettingsHeaderText extends StatelessWidget {
+  SettingsHeaderText({super.key});
+
+  Widget build(BuildContext context) {
+    return Container();
   }
 }

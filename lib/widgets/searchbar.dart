@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gifza/themes/theme.dart';
 
 class GifzaSearchBar extends StatelessWidget {
   GifzaSearchBar({super.key});
