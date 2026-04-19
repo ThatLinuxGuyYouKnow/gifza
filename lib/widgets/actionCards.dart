@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gifza/widgets/uploadAssetsModal.dart';
 
 class UploadNewCard extends StatefulWidget {
-  const UploadNewCard({super.key});
+  final Function() onPressed;
+  const UploadNewCard({super.key, required this.onPressed});
 
   @override
   State<UploadNewCard> createState() => _UploadNewCardState();
@@ -14,70 +16,79 @@ class _UploadNewCardState extends State<UploadNewCard> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      cursor: SystemMouseCursors.click,
-      child: AnimatedScale(
-        scale: _hovered ? 1.03 : 1.0,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
-        child: AnimatedContainer(
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return UploadAssetModal();
+            });
+      },
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        cursor: SystemMouseCursors.click,
+        child: AnimatedScale(
+          scale: _hovered ? 1.03 : 1.0,
           duration: const Duration(milliseconds: 200),
-          height: 250,
-          width: 400,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                scheme.tertiary,
-                scheme.tertiary.withOpacity(_hovered ? 0.9 : 0.85)
-              ],
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: 250,
+            width: 400,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  scheme.tertiary,
+                  scheme.tertiary.withOpacity(_hovered ? 0.9 : 0.85)
+                ],
+              ),
+              color: scheme.tertiary,
+              borderRadius: BorderRadius.circular(50),
+              boxShadow: _hovered
+                  ? [
+                      BoxShadow(
+                        color: scheme.tertiary.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      )
+                    ]
+                  : [],
             ),
-            color: scheme.tertiary,
-            borderRadius: BorderRadius.circular(50),
-            boxShadow: _hovered
-                ? [
-                    BoxShadow(
-                      color: scheme.tertiary.withOpacity(0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    )
-                  ]
-                : [],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AnimatedScale(
-                  scale: _hovered ? 1.05 : 1.0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOutCubic,
-                  child: Container(
-                    height: 80,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white.withOpacity(0.2),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AnimatedScale(
+                    scale: _hovered ? 1.05 : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOutCubic,
+                    child: Container(
+                      height: 80,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.white.withOpacity(0.2),
+                      ),
+                      child: const Icon(Icons.upload_file,
+                          color: Colors.white, size: 32),
                     ),
-                    child: const Icon(Icons.upload_file,
-                        color: Colors.white, size: 32),
                   ),
-                ),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: _hovered ? 18 : 16,
-                    fontWeight: _hovered ? FontWeight.w600 : FontWeight.w500,
-                  ),
-                  child: const Text('Upload an Image or GIF'),
-                )
-              ],
+                  AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 200),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: _hovered ? 18 : 16,
+                      fontWeight: _hovered ? FontWeight.w600 : FontWeight.w500,
+                    ),
+                    child: const Text('Upload an Image or GIF'),
+                  )
+                ],
+              ),
             ),
           ),
         ),

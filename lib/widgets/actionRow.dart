@@ -9,7 +9,13 @@ class ActionRow extends StatelessWidget {
       height: 410,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [UploadNewCard(), LibraryActionCard(), RecentAssetsCard()],
+        children: [
+          UploadNewCard(
+            onPressed: () {},
+          ),
+          LibraryActionCard(),
+          RecentAssetsCard()
+        ],
       ),
     );
   }
