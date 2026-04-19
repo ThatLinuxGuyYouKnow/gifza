@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:gifza/providers/assetProvider.dart';
 import 'package:gifza/themes/theme.dart';
 import 'package:gifza/widgets/appbar.dart';
 import 'package:gifza/providers/screenProvider.dart';
@@ -8,9 +9,12 @@ import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    MultiProvider(
-        providers: [ChangeNotifierProvider(create: (_) => ScreenProvider())],
-        child: MyApp()),
+    MultiProvider(providers: [
+      ChangeNotifierProvider(
+        create: (_) => ScreenProvider(),
+      ),
+      ChangeNotifierProvider(create: (_) => AssetProvider())
+    ], child: MyApp()),
   );
 }
 
