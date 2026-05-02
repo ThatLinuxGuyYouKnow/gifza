@@ -4,10 +4,10 @@ import 'package:dart_sentencepiece_tokenizer/dart_sentencepiece_tokenizer.dart';
 class ClipTokenizerService {
   late SentencePieceTokenizer _tokenizer;
 
-  static const int startToken = 49406; // <|startoftext|>
-  static const int endToken = 49407; // <|endoftext|>
-  static const int padToken = 0; // Padding
-  static const int maxLength = 77; // MobileCLIP requirement
+  static const int startToken = 49406;
+  static const int endToken = 49407;
+  static const int padToken = 0;
+  static const int maxLength = 77;
 
   Future<void> init() async {
     final jsonString =

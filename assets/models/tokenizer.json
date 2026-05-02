@@ -4,22 +4,22 @@
   "padding": null,
   "added_tokens": [
     {
-      "id": 49406,
-      "special": true,
+      "id": 0,
       "content": "<|startoftext|>",
       "single_word": false,
       "lstrip": false,
       "rstrip": false,
-      "normalized": true
+      "normalized": true,
+      "special": true
     },
     {
-      "id": 49407,
-      "special": true,
+      "id": 1,
       "content": "<|endoftext|>",
       "single_word": false,
       "lstrip": false,
       "rstrip": false,
-      "normalized": false
+      "normalized": true,
+      "special": true
     }
   ],
   "normalizer": {
@@ -29,58 +29,71 @@
         "type": "NFC"
       },
       {
-        "type": "Replace",
-        "pattern": {
-          "Regex": "\\s+"
-        },
-        "content": " "
-      },
-      {
         "type": "Lowercase"
       }
     ]
   },
   "pre_tokenizer": {
-    "type": "Sequence",
-    "pretokenizers": [
-      {
-        "type": "Split",
-        "pattern": {
-          "Regex": "<\\|startoftext\\|>|<\\|endoftext\\|>|'s|'t|'re|'ve|'m|'ll|'d|[\\p{L}]+|[\\p{N}]|[^\\s\\p{L}\\p{N}]+"
-        },
-        "behavior": "Removed",
-        "invert": true
-      },
-      {
-        "type": "ByteLevel",
-        "add_prefix_space": false,
-        "trim_offsets": true
-      }
-    ]
+    "type": "Split",
+    "pattern": {
+      "Regex": "'s|'t|'re|'ve|'m|'ll|'d|[\\p{L}]+|[\\p{N}]|[^\\s\\p{L}\\p{N}]+"
+    },
+    "behavior": "Removed",
+    "invert": false
   },
   "post_processor": {
-    "type": "RobertaProcessing",
-    "sep": [
-      "<|endoftext|>",
-      49407
+    "type": "TemplateProcessing",
+    "single": [
+      {
+        "SpecialToken": {
+          "id": "<|startoftext|>",
+          "type_id": 0
+        }
+      },
+      {
+        "Sequence": {
+          "id": "A",
+          "type_id": 0
+        }
+      },
+      {
+        "SpecialToken": {
+          "id": "<|endoftext|>",
+          "type_id": 0
+        }
+      }
     ],
-    "cls": [
-      "<|startoftext|>",
-      49406
-    ],
-    "trim_offsets": false,
-    "add_prefix_space": false
+    "pair": null,
+    "special_tokens": {
+      "<|startoftext|>": {
+        "id": "<|startoftext|>",
+        "ids": [
+          49406
+        ],
+        "tokens": [
+          "<|startoftext|>"
+        ]
+      },
+      "<|endoftext|>": {
+        "id": "<|endoftext|>",
+        "ids": [
+          49407
+        ],
+        "tokens": [
+          "<|endoftext|>"
+        ]
+      }
+    }
   },
   "decoder": {
-    "type": "ByteLevel",
-    "add_prefix_space": true,
-    "trim_offsets": true
+    "type": "BPEDecoder",
+    "suffix": "</w>"
   },
   "model": {
     "type": "BPE",
     "dropout": null,
     "unk_token": "<|endoftext|>",
-    "continuing_subword_prefix": "",
+    "continuing_subword_prefix": null,
     "end_of_word_suffix": "</w>",
     "fuse_unk": false,
     "vocab": {
@@ -49490,8 +49503,8 @@
       "rendous</w>": 49403,
       "ðŁĴĳ</w>": 49404,
       "jekyll</w>": 49405,
-      "<|startoftext|>": 49406,
-      "<|endoftext|>": 49407
+      "<start_of_text>": 49406,
+      "<end_of_text>": 49407
     },
     "merges": [
       "i n",
