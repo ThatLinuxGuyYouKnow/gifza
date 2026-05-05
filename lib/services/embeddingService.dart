@@ -20,12 +20,15 @@ class EmbeddingService {
         await ExecuTorchModel.loadFromBytes(imageByteData.buffer.asUint8List());
   }
 
-  generateEmbeddings(
+  Future<List<double>?> generateEmbeddings(
       {List<int>? tokens,
       Float32List? imageTensor,
       required AssetType assetType}) async {
     if (_textModel == null) {
-      throw ('Text model failed to initialize');
+      throw Exception('Text model failed to initialize, does it exist?');
+    }
+    if (_imageModel == null) {
+      throw Exception('Image model failed to initialize, does it exist?');
     }
 
     if (assetType == AssetType.text) {
@@ -49,7 +52,9 @@ class EmbeddingService {
 
           return _normalize(rawEmbeddings);
         }
-      } catch (error) {}
+      } catch (error) {
+        throw Exception('Failed to generate Embeddings');
+      }
     } else {
       final inputTensors = TensorData(
           shape: [1, 3, 256, 256],
@@ -61,6 +66,7 @@ class EmbeddingService {
       return _normalize(
           Float32List.sublistView(imageOutput.first.data).toList());
     }
+    return null;
   }
 
   /// L2 normalization

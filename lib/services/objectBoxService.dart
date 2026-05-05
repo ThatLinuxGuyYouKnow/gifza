@@ -2,6 +2,21 @@ import 'package:gifza/models/asset_entity.dart';
 import 'package:gifza/services/objectBoxSetup.dart';
 import '../objectbox.g.dart';
 
+_deduplicate(results) {
+  final seenAssets =
+      <String>{}; //strongly typed string set, fucntionally could also be a list, but Set has O(1) look up so preferred
+  final assetsToReturn = <AssetEntity>[];
+
+  for (AssetEntity asset in results) {
+    if (!seenAssets.contains(asset.content)) {
+      assetsToReturn.add(asset);
+      seenAssets.add(asset.content);
+    }
+  }
+
+  return assetsToReturn;
+}
+
 class ObjectBoxService {
   late final Store store;
   late final Box<AssetEntity> box;
@@ -28,6 +43,8 @@ class ObjectBoxService {
       box.put(assetWithAnnotation);
     }
     box.put(newAsset);
+
+    print('Stored succesfully');
   }
 
   /// function for getting the closest N items to the query embedding.
@@ -44,21 +61,6 @@ class ObjectBoxService {
       required List<double> queryEmbedding,
       bool deduplicate = true,
       double scoreThreshold = 0.6}) {
-    _deduplicate(results) {
-      final seenAssets =
-          <String>{}; //strongly typed string set, fucntionally could also be a list, but Set has O(1) look up so preferred
-      final assetsToReturn = <AssetEntity>[];
-
-      for (AssetEntity asset in results) {
-        if (!seenAssets.contains(asset.content)) {
-          assetsToReturn.add(asset);
-          seenAssets.add(asset.content);
-        }
-      }
-
-      return assetsToReturn;
-    }
-
     final query = box
         .query(AssetEntity_.embedding.nearestNeighborsF32(queryEmbedding, N))
         .build();
@@ -73,4 +75,6 @@ class ObjectBoxService {
 
     return deduplicate ? _deduplicate(filtered) : filtered;
   }
+
+  List<AssetEntity> get assetsInStorage => _deduplicate(box.getAll());
 }
