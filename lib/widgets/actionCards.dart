@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gifza/providers/screenProvider.dart';
+import 'package:gifza/screens/library.dart';
 import 'package:gifza/widgets/uploadAssetsModal.dart';
+import 'package:provider/provider.dart';
 
 class UploadNewCard extends StatefulWidget {
   final Function() onPressed;
@@ -110,53 +113,60 @@ class _LibraryActionCardState extends State<LibraryActionCard> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final screenProvider = Provider.of<ScreenProvider>(context, listen: false);
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      cursor: SystemMouseCursors.click,
-      child: AnimatedScale(
-        scale: _hovered ? 1.03 : 1.0,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
-        child: AnimatedContainer(
+    return GestureDetector(
+      onTap: () {
+        screenProvider.routeToScreen(screen: AppScreen.library);
+      },
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        cursor: SystemMouseCursors.click,
+        child: AnimatedScale(
+          scale: _hovered ? 1.03 : 1.0,
           duration: const Duration(milliseconds: 200),
-          height: 250,
-          width: 400,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50),
-            color: _hovered ? const Color(0xFF1A2744) : const Color(0xFF141f38),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AnimatedScale(
-                  scale: _hovered ? 1.05 : 1.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Container(
-                    height: 80,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: scheme.surface.withOpacity(0.4),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: 250,
+            width: 400,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
+              color:
+                  _hovered ? const Color(0xFF1A2744) : const Color(0xFF141f38),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AnimatedScale(
+                    scale: _hovered ? 1.05 : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Container(
+                      height: 80,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: scheme.surface.withOpacity(0.4),
+                      ),
+                      child: const Icon(Icons.library_add,
+                          color: Colors.white, size: 32),
                     ),
-                    child: const Icon(Icons.library_add,
-                        color: Colors.white, size: 32),
                   ),
-                ),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: _hovered ? 18 : 16,
-                    fontWeight: _hovered ? FontWeight.w600 : FontWeight.w500,
-                  ),
-                  child: const Text('Open Library'),
-                )
-              ],
+                  AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 200),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: _hovered ? 18 : 16,
+                      fontWeight: _hovered ? FontWeight.w600 : FontWeight.w500,
+                    ),
+                    child: const Text('Open Library'),
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -179,52 +189,56 @@ class _RecentAssetsCardState extends State<RecentAssetsCard> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      cursor: SystemMouseCursors.click,
-      child: AnimatedScale(
-        scale: _hovered ? 1.03 : 1.0,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
-        child: AnimatedContainer(
+    return GestureDetector(
+      onTap: () {},
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        cursor: SystemMouseCursors.click,
+        child: AnimatedScale(
+          scale: _hovered ? 1.03 : 1.0,
           duration: const Duration(milliseconds: 200),
-          height: 250,
-          width: 400,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50),
-            color: _hovered ? const Color(0xFF1A2744) : const Color(0xFF141f38),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AnimatedScale(
-                  scale: _hovered ? 1.05 : 1.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Container(
-                    height: 80,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: scheme.surface.withOpacity(0.4),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: 250,
+            width: 400,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
+              color:
+                  _hovered ? const Color(0xFF1A2744) : const Color(0xFF141f38),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AnimatedScale(
+                    scale: _hovered ? 1.05 : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Container(
+                      height: 80,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: scheme.surface.withOpacity(0.4),
+                      ),
+                      child: const Icon(Icons.history,
+                          color: Colors.white, size: 32),
                     ),
-                    child: const Icon(Icons.history,
-                        color: Colors.white, size: 32),
                   ),
-                ),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: _hovered ? 18 : 16,
-                    fontWeight: _hovered ? FontWeight.w600 : FontWeight.w500,
-                  ),
-                  child: const Text('Recent Assets'),
-                )
-              ],
+                  AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 200),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: _hovered ? 18 : 16,
+                      fontWeight: _hovered ? FontWeight.w600 : FontWeight.w500,
+                    ),
+                    child: const Text('Recent Assets'),
+                  )
+                ],
+              ),
             ),
           ),
         ),
