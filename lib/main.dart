@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:gifza/providers/assetProvider.dart';
+import 'package:gifza/providers/searchProvider.dart';
+import 'package:gifza/screens/splashScreen.dart';
 import 'package:gifza/services/embeddingService.dart';
 import 'package:gifza/services/objectBoxService.dart';
 import 'package:gifza/services/tokenizerService.dart';
@@ -13,47 +15,84 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final ObjectBoxService objectBoxService = ObjectBoxService();
-  await objectBoxService.initialize();
+  runApp(GifzaApp());
+}
 
-  final EmbeddingService embeddingService = EmbeddingService();
-  await embeddingService.initialize();
+class GifzaApp extends StatefulWidget {
+  GifzaApp({super.key});
 
-  final ClipTokenizerService tokenizerService = ClipTokenizerService();
-  tokenizerService.init();
+  @override
+  State<GifzaApp> createState() => _GifzaAppState();
+}
 
-  runApp(
-    MultiProvider(providers: [
+class _GifzaAppState extends State<GifzaApp> {
+  bool _initialized = false;
+
+  ObjectBoxService? _objectBoxService;
+  EmbeddingService? _embeddingService;
+  ClipTokenizerService? _clipTokenizerService;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
+
+  _initialize() async {
+    final objectBox = ObjectBoxService();
+
+    final embeddingService = EmbeddingService();
+
+    final tokenizer = ClipTokenizerService();
+
+    /// initialize everything in parallel
+    await Future.wait<void>([
+      objectBox.initialize(),
+      embeddingService.initialize(),
+      tokenizer.init(),
+    ]);
+
+    if (!mounted) return;
+    setState(() {
+      _objectBoxService = objectBox;
+      _embeddingService = embeddingService;
+      _clipTokenizerService = tokenizer;
+      _initialized = true;
+    });
+  }
+
+  Widget build(BuildContext context) {
+    if (!_initialized) {
+      return MaterialApp(theme: theme, home: SplashScreen());
+    }
+    return MultiProvider(providers: [
       ChangeNotifierProvider(
         create: (_) => ScreenProvider(),
       ),
       ChangeNotifierProvider(create: (_) => AssetProvider()),
+      ChangeNotifierProvider(create: (_) => SearchProvider()),
       Provider<ObjectBoxService>.value(
-        value: objectBoxService,
+        value: _objectBoxService!,
       ),
-
-      Provider<EmbeddingService>.value(value:)
-    ], child: MyApp()),
-  );
+      Provider<EmbeddingService>.value(value: _embeddingService!),
+      Provider<ClipTokenizerService>.value(value: _clipTokenizerService!),
+    ], child: MaterialApp(theme: theme, home: HomePage()));
+  }
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final Widget currentScreen =
         context.watch<ScreenProvider>().currentScreenWidget;
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Gifza',
-        theme: theme,
-        home: Scaffold(
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(80),
-            child: GifzaAppBar(),
-          ),
-          body: currentScreen,
-        ));
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: GifzaAppBar(),
+      ),
+      body: currentScreen,
+    );
   }
 }
