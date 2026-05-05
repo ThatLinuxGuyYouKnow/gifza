@@ -46,6 +46,7 @@ flutter:
   assets:
     - assets/
     - assets/models/text.pte
+    - assets/models/image.pte
     - assets/models/tokenizer.json
 
   fonts:

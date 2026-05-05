@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gifza/themes/theme.dart';
 
 class SettingsTile extends StatefulWidget {
   final String titleText;
