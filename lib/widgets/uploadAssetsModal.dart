@@ -1,9 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gifza/providers/assetProvider.dart';
 import 'package:gifza/services/embeddingService.dart';
+import 'package:gifza/services/objectBoxService.dart';
 
 import 'package:gifza/services/tokenizerService.dart';
 import 'package:gifza/utils/pickAssetfromFiles.dart';
+import 'package:gifza/utils/preprocessImage.dart';
+import 'package:gifza/widgets/alerts/errorAlert.dart';
+
+import 'package:gifza/widgets/alerts/sucessfulIndex.dart';
 import 'package:provider/provider.dart';
 
 class UploadAssetModal extends StatefulWidget {
@@ -15,25 +21,15 @@ class UploadAssetModal extends StatefulWidget {
 
 class _UploadAssetModalState extends State<UploadAssetModal> {
   String? annotationText;
-  final ClipTokenizerService _tokenizerService = ClipTokenizerService();
-  final EmbeddingService _embedding = EmbeddingService();
-
-  Future<void> _initServices() async {
-    await _tokenizerService.init();
-    await _embedding.initialize();
-  }
-
-  void initState() {
-    super.initState();
-
-    _initServices();
-  }
+  bool _isIndexing = false;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final assetProvider = Provider.of<AssetProvider>(context, listen: true);
-
+    final _tokenizer = context.read<ClipTokenizerService>();
+    final _embedding = context.read<EmbeddingService>();
+    final _objectBox = context.read<ObjectBoxService>();
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
@@ -162,23 +158,106 @@ class _UploadAssetModalState extends State<UploadAssetModal> {
             ),
             const SizedBox(height: 30),
             GestureDetector(
-              onTap: () {
-                final tokens = _tokenizerService.tokenize(annotationText ?? '');
-                _embedding.generateEmbeddings(
-                    tokens: tokens, assetType: AssetType.text);
-              },
+              onTap: (_isIndexing == true || assetProvider.asset == null)
+                  ? null
+                  : () async {
+                      setState(() {
+                        _isIndexing = true;
+                      });
+
+                      final imagePipeline = () async {
+                        if (kDebugMode) {
+                          print('starting image embedding');
+                        }
+                        try {
+                          final imageTensorFuture = compute(
+                              preprocessImage, assetProvider.asset!.assetBytes);
+
+                          final result = await _embedding.generateEmbeddings(
+                              assetType: AssetType.image,
+                              imageTensor: await imageTensorFuture);
+
+                          if (kDebugMode) {
+                            print('all done with image embedding!');
+                          }
+                          return result;
+                        } catch (e) {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return ErrorAlert(
+                                  errorTitle: 'Error Occured $e',
+                                );
+                              });
+                        }
+                      }();
+
+                      final textPipeline = (annotationText != null)
+                          ? () async {
+                              if (kDebugMode) {
+                                print('starting text embedding');
+                              }
+
+                              final tokens =
+                                  _tokenizer.tokenize(annotationText ?? '');
+                              print('finished tokenizing');
+                              final result =
+                                  await _embedding.generateEmbeddings(
+                                      tokens: tokens,
+                                      assetType: AssetType.text);
+
+                              if (kDebugMode) {
+                                print('all done with image embedding!');
+                              }
+
+                              return result;
+                            }()
+                          : null;
+
+                      final textEmbeddings = await textPipeline;
+                      final imageEmbeddings = await imagePipeline;
+                      if (annotationText != null) {
+                        _objectBox.storeAsset(
+                            assetPath: assetProvider.asset!.assetPath,
+                            imageEmbedding: imageEmbeddings!,
+                            annotationEmbedding: textEmbeddings);
+                      } else {
+                        _objectBox.storeAsset(
+                          assetPath: assetProvider.asset!.assetPath,
+                          imageEmbedding: imageEmbeddings!,
+                        );
+                      }
+                      setState(() {
+                        _isIndexing = false;
+                      });
+
+                      assetProvider.clear();
+                      Navigator.pop(context);
+
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SuccesfulIndexAlert(
+                              annotation: annotationText,
+                            );
+                          });
+                    },
               child: Container(
                 height: 80,
                 width: 700,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: scheme.primary),
-                child: const Center(
-                  child: Text('Index',
-                      style: TextStyle(
+                child: Center(
+                  child: _isIndexing
+                      ? CircularProgressIndicator(
                           color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18)),
+                        )
+                      : Text('Index',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18)),
                 ),
               ),
             )

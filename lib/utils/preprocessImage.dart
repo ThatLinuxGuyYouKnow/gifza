@@ -1,22 +1,13 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
-import 'package:file_picker/file_picker.dart';
 
 Future<Float32List> preprocessImage(
-  PlatformFile imageFile, {
+  Uint8List bytes, {
   int targetWidth = 256,
   int targetHeight = 256,
   List<double> meanValues = const [0.485, 0.456, 0.406],
   List<double> stdValues = const [0.229, 0.224, 0.225],
 }) async {
-  // Validate input file path
-  if (imageFile.path == null) {
-    throw Exception('Image file path is null');
-  }
-
-  // Read the image file
-  final bytes = await File(imageFile.path!).readAsBytes();
   var image = img.decodeImage(bytes);
 
   if (image == null) {
