@@ -22,7 +22,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 3523635215423367666),
     name: 'AssetEntity',
-    lastPropertyId: const obx_int.IdUid(4, 7108545483448956272),
+    lastPropertyId: const obx_int.IdUid(5, 8049875002958994820),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -44,6 +44,12 @@ final _entities = <obx_int.ModelEntity>[
         flags: 8,
         indexId: const obx_int.IdUid(1, 4741909422397095098),
         hnswParams: obx_int.ModelHnswParams(dimensions: 512),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 8049875002958994820),
+        name: 'dateIndexed',
+        type: 10,
+        flags: 0,
       ),
     ],
     relations: <obx_int.ModelRelation>[],
@@ -121,16 +127,22 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final embeddingOffset = object.embedding == null
             ? null
             : fbb.writeListFloat32(object.embedding!);
-        fbb.startTable(5);
+        fbb.startTable(6);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, contentOffset);
         fbb.addOffset(3, embeddingOffset);
+        fbb.addInt64(4, object.dateIndexed?.millisecondsSinceEpoch);
         fbb.finish(fbb.endTable());
         return object.id;
       },
       objectFromFB: (obx.Store store, ByteData fbData) {
         final buffer = fb.BufferContext(fbData);
         final rootOffset = buffer.derefObject(0);
+        final dateIndexedValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          12,
+        );
         final idParam = const fb.Int64Reader().vTableGet(
           buffer,
           rootOffset,
@@ -144,10 +156,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fb.Float32Reader(),
           lazy: false,
         ).vTableGetNullable(buffer, rootOffset, 10);
+        final dateIndexedParam = dateIndexedValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(dateIndexedValue);
         final object = AssetEntity(
           id: idParam,
           content: contentParam,
           embedding: embeddingParam,
+          dateIndexed: dateIndexedParam,
         );
 
         return object;
@@ -173,5 +189,10 @@ class AssetEntity_ {
   /// See [AssetEntity.embedding].
   static final embedding = obx.QueryHnswProperty<AssetEntity>(
     _entities[0].properties[2],
+  );
+
+  /// See [AssetEntity.dateIndexed].
+  static final dateIndexed = obx.QueryDateProperty<AssetEntity>(
+    _entities[0].properties[3],
   );
 }

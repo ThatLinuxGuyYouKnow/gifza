@@ -23,7 +23,7 @@ class SearchResultsScreen extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 40),
                       child: Text(
-                        'Assets matching your search results',
+                        'Assets matching your search query',
                         style: TextStyle(
                             fontFamily: 'Jakarta',
                             fontSize: 30,

@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:3523635215423367666",
-      "lastPropertyId": "4:7108545483448956272",
+      "lastPropertyId": "5:8049875002958994820",
       "name": "AssetEntity",
       "properties": [
         {
@@ -25,6 +25,11 @@
           "indexId": "1:4741909422397095098",
           "type": 28,
           "flags": 8
+        },
+        {
+          "id": "5:8049875002958994820",
+          "name": "dateIndexed",
+          "type": 10
         }
       ],
       "relations": []

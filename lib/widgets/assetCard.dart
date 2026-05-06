@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gifza/models/asset_entity.dart';
+import 'package:gifza/widgets/assetInfoModal.dart';
 
 class AssetCard extends StatelessWidget {
   final AssetEntity asset;
@@ -19,16 +20,23 @@ class AssetCard extends StatelessWidget {
           ),
           child: Stack(children: [
             Positioned.fill(
-              child: Image.file(
-                File(asset.content),
-                fit: BoxFit.cover,
-              ),
-            ),
+                child: File(asset.content).existsSync()
+                    ? Image.file(
+                        File(asset.content),
+                        fit: BoxFit.cover,
+                      )
+                    : Icon(Icons.broken_image)),
             Positioned(
                 top: 15,
                 right: 15,
                 child: GestureDetector(
-                  onTap: () => null,
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AssetInfoModal(asset: asset);
+                        });
+                  },
                   child: Container(
                     height: 40,
                     width: 40,
