@@ -11,7 +11,7 @@ class HomeLibrarySubsection extends StatelessWidget {
   Widget build(BuildContext context) {
     final _objectBox = context.read<ObjectBoxService>();
 
-    // only display 4 at a time, we don't want to render too many images here, users can view all their images in their Library
+    // only display 4(max) at a time, we don't want to render too many images here, users can view all their images in their Library
     List<AssetEntity> _assets = _objectBox.assetsInStorage
         .asMap()
         .entries
@@ -19,7 +19,7 @@ class HomeLibrarySubsection extends StatelessWidget {
         .map((entry) => entry.value)
         .toList();
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 100),
+      padding: EdgeInsets.symmetric(vertical: 80),
       child: _assets.isEmpty
           ? EmptyAssetState()
           : GridView.builder(
