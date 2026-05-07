@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gifza/models/asset_entity.dart';
+import 'package:gifza/providers/screenProvider.dart';
+import 'package:gifza/providers/searchProvider.dart';
 
 import 'package:gifza/services/objectBoxService.dart';
 import 'package:gifza/utils/sortAssetsByDateIndexed.dart';
@@ -9,7 +11,8 @@ import 'package:gifza/widgets/homeLibrarySubsection.dart';
 import 'package:provider/provider.dart';
 
 class LibraryScreen extends StatefulWidget {
-  const LibraryScreen({super.key});
+  final LibraryMode libraryMode;
+  const LibraryScreen({super.key, required this.libraryMode});
 
   @override
   State<LibraryScreen> createState() => _LibraryScreenState();
@@ -22,9 +25,33 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
     final objectBox = context.read<ObjectBoxService>();
 
-    final allSavedAssets = context.watch<ObjectBoxService>().assetsInStorage;
+    ///vary header text depending on library mode
+    String headerText(LibraryMode libraryMode) => switch (libraryMode) {
+          LibraryMode.fullLibrary => "All your assets",
+          LibraryMode.recent => "Assets you've recently added",
+          LibraryMode.search => "Assets matching your search"
+        };
+
+    fillAssetBucket(LibraryMode libraryMode) => switch (libraryMode) {
+          LibraryMode.fullLibrary =>
+            context.watch<ObjectBoxService>().assetsInStorage,
+          LibraryMode.search =>
+            Provider.of<SearchProvider>(context, listen: false).assets,
+          LibraryMode.recent => context
+              .read<ObjectBoxService>()
+              .assetsInStorage
+              .asMap()
+              .entries
+              .where((entry) => entry.key % 4 == 0)
+              .map((entry) => entry.value)
+              .toList()
+        };
+
+    /// bucket of assets we'll be manipulating, will depend on library mode
+    List<AssetEntity> assetBucket = fillAssetBucket(widget.libraryMode);
+
     final List<AssetEntity> deduplicatedAssets =
-        objectBox.deduplicateAssets(results: allSavedAssets);
+        objectBox.deduplicateAssets(results: assetBucket);
 
     final List<AssetEntity> sortedSavedAssets =
         sortAssets(assets: deduplicatedAssets, sortOrder: _sortOrder);
@@ -45,7 +72,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'All your assets',
+                          headerText(widget.libraryMode),
                           style: TextStyle(
                               fontFamily: 'Jakarta',
                               fontSize: 30,
