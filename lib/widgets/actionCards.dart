@@ -117,7 +117,8 @@ class _LibraryActionCardState extends State<LibraryActionCard> {
 
     return GestureDetector(
       onTap: () {
-        screenProvider.routeToScreen(screen: AppScreen.library);
+        screenProvider.routeToScreen(
+            screen: AppScreen.library, mode: LibraryMode.fullLibrary);
       },
       child: MouseRegion(
         onEnter: (_) => setState(() => _hovered = true),
@@ -188,9 +189,13 @@ class _RecentAssetsCardState extends State<RecentAssetsCard> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final screenProvider = Provider.of<ScreenProvider>(context, listen: false);
 
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        screenProvider.routeToScreen(
+            screen: AppScreen.library, mode: LibraryMode.recent);
+      },
       child: MouseRegion(
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),

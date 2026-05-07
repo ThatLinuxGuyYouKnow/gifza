@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gifza/providers/screenProvider.dart';
 import 'package:gifza/providers/searchProvider.dart';
+import 'package:gifza/screens/library.dart';
 import 'package:gifza/services/embeddingService.dart';
 import 'package:gifza/services/objectBoxService.dart';
 import 'package:gifza/services/tokenizerService.dart';
@@ -78,7 +79,8 @@ class _GifzaSearchBarState extends State<GifzaSearchBar> {
                         searchProvider.updateSearchResults(results: results!);
                         Navigator.pop(context);
                         screenProvider.routeToScreen(
-                            screen: AppScreen.searchResults);
+                            screen: AppScreen.library,
+                            mode: LibraryMode.search);
                       },
                 child: Container(
                   height: 60,
