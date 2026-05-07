@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gifza/providers/screenProvider.dart';
-import 'package:gifza/screens/library.dart';
+
 import 'package:gifza/widgets/uploadAssetsModal.dart';
 import 'package:provider/provider.dart';
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gifza/providers/screenProvider.dart';
 import 'package:gifza/providers/searchProvider.dart';
-import 'package:gifza/screens/searchResults.dart';
 import 'package:gifza/services/embeddingService.dart';
 import 'package:gifza/services/objectBoxService.dart';
 import 'package:gifza/services/tokenizerService.dart';
