@@ -2,21 +2,6 @@ import 'package:gifza/models/asset_entity.dart';
 import 'package:gifza/services/objectBoxSetup.dart';
 import '../objectbox.g.dart';
 
-_deduplicate(results) {
-  final seenAssets =
-      <String>{}; //strongly typed string set, fucntionally could also be a list, but Set has O(1) look up so preferred
-  final assetsToReturn = <AssetEntity>[];
-
-  for (AssetEntity asset in results) {
-    if (!seenAssets.contains(asset.content)) {
-      assetsToReturn.add(asset);
-      seenAssets.add(asset.content);
-    }
-  }
-
-  return assetsToReturn;
-}
-
 class ObjectBoxService {
   late final Store store;
   late final Box<AssetEntity> box;
@@ -27,18 +12,35 @@ class ObjectBoxService {
     box = Box<AssetEntity>(store);
   }
 
+  List<AssetEntity> deduplicateAssets({required List<AssetEntity> results}) {
+    final seenAssets =
+        <String>{}; //strongly typed string set, fucntionally could also be a list, but Set has O(1) look up so preferred
+    final assetsToReturn = <AssetEntity>[];
+
+    for (AssetEntity asset in results) {
+      if (!seenAssets.contains(asset.content)) {
+        assetsToReturn.add(asset);
+        seenAssets.add(asset.content);
+      }
+    }
+
+    return assetsToReturn;
+  }
+
   storeAsset(
       {required String assetPath,
       required List<double> imageEmbedding,
       List<double>? annotationEmbedding}) {
     final newAsset = AssetEntity(
-      content: assetPath,
-      embedding: imageEmbedding,
-    );
+        content: assetPath,
+        embedding: imageEmbedding,
+        dateIndexed: DateTime.now());
 
     if (annotationEmbedding != null) {
-      final assetWithAnnotation =
-          AssetEntity(content: assetPath, embedding: annotationEmbedding);
+      final assetWithAnnotation = AssetEntity(
+          content: assetPath,
+          embedding: annotationEmbedding,
+          dateIndexed: DateTime.now());
 
       box.put(assetWithAnnotation);
     }
@@ -73,8 +75,9 @@ class ObjectBoxService {
         .whereType<AssetEntity>()
         .toList();
 
-    return deduplicate ? _deduplicate(filtered) : filtered;
+    return deduplicate ? deduplicateAssets(results: filtered) : filtered;
   }
 
-  List<AssetEntity> get assetsInStorage => _deduplicate(box.getAll());
+  List<AssetEntity> get assetsInStorage =>
+      deduplicateAssets(results: box.getAll());
 }
