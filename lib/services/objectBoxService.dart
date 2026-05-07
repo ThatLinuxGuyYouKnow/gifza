@@ -1,5 +1,6 @@
 import 'package:gifza/models/asset_entity.dart';
 import 'package:gifza/services/objectBoxSetup.dart';
+import 'package:gifza/utils/deduplicateAssets.dart';
 import '../objectbox.g.dart';
 
 class ObjectBoxService {
@@ -10,21 +11,6 @@ class ObjectBoxService {
     final objectBox = await ObjectBox.create();
     store = objectBox.store;
     box = Box<AssetEntity>(store);
-  }
-
-  List<AssetEntity> deduplicateAssets({required List<AssetEntity> results}) {
-    final seenAssets =
-        <String>{}; //strongly typed string set, fucntionally could also be a list, but Set has O(1) look up so preferred
-    final assetsToReturn = <AssetEntity>[];
-
-    for (AssetEntity asset in results) {
-      if (!seenAssets.contains(asset.content)) {
-        assetsToReturn.add(asset);
-        seenAssets.add(asset.content);
-      }
-    }
-
-    return assetsToReturn;
   }
 
   storeAsset(

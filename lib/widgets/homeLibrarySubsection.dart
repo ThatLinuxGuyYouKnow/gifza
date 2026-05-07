@@ -39,7 +39,8 @@ class HomeLibrarySubsection extends StatelessWidget {
 }
 
 class EmptyAssetState extends StatelessWidget {
-  const EmptyAssetState({super.key});
+  final String message;
+  const EmptyAssetState({super.key, this.message = 'No assets in your vault'});
 
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
@@ -55,7 +56,7 @@ class EmptyAssetState extends StatelessWidget {
             child: Padding(
           padding: EdgeInsets.symmetric(vertical: 80.0, horizontal: 20),
           child: Text(
-            'No assets in your vault',
+            message,
             style: TextStyle(fontFamily: 'Jakarta', fontSize: 18),
           ),
         )),

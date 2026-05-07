@@ -4,12 +4,15 @@ import 'package:gifza/providers/screenProvider.dart';
 import 'package:gifza/providers/searchProvider.dart';
 
 import 'package:gifza/services/objectBoxService.dart';
+import 'package:gifza/utils/deduplicateAssets.dart';
 import 'package:gifza/utils/sortAssetsByDateIndexed.dart';
 import 'package:gifza/widgets/assetCard.dart';
 import 'package:gifza/widgets/filterPills.dart';
 import 'package:gifza/widgets/homeLibrarySubsection.dart';
 import 'package:provider/provider.dart';
 
+/// re usable library component, because, search, full library and recent assets all very similar layout / functionality, we just use
+/// one component for it and use conditional rendering
 class LibraryScreen extends StatefulWidget {
   final LibraryMode libraryMode;
   const LibraryScreen({super.key, required this.libraryMode});
@@ -20,44 +23,51 @@ class LibraryScreen extends StatefulWidget {
 
 class _LibraryScreenState extends State<LibraryScreen> {
   String _sortOrder = 'desc';
+
+  ///vary header text depending on library mode
+  headerText(LibraryMode libraryMode) => switch (libraryMode) {
+        LibraryMode.fullLibrary => "All your assets",
+        LibraryMode.recent => "Assets you've recently added",
+        LibraryMode.search => "Assets matching your search"
+      };
+
+  fillAssetBucket(LibraryMode libraryMode) => switch (libraryMode) {
+        LibraryMode.fullLibrary ||
+        LibraryMode.recent =>
+          context.watch<ObjectBoxService>().assetsInStorage,
+        LibraryMode.search =>
+          Provider.of<SearchProvider>(context, listen: false).assets,
+      };
+
+  getEmptyMessage(LibraryMode mode) => switch (mode) {
+        LibraryMode.fullLibrary ||
+        LibraryMode.recent =>
+          "No assets in your vault",
+        LibraryMode.search => "No assets match your search query"
+      };
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
-
-    final objectBox = context.read<ObjectBoxService>();
-
-    ///vary header text depending on library mode
-    String headerText(LibraryMode libraryMode) => switch (libraryMode) {
-          LibraryMode.fullLibrary => "All your assets",
-          LibraryMode.recent => "Assets you've recently added",
-          LibraryMode.search => "Assets matching your search"
-        };
-
-    fillAssetBucket(LibraryMode libraryMode) => switch (libraryMode) {
-          LibraryMode.fullLibrary =>
-            context.watch<ObjectBoxService>().assetsInStorage,
-          LibraryMode.search =>
-            Provider.of<SearchProvider>(context, listen: false).assets,
-          LibraryMode.recent => context
-              .read<ObjectBoxService>()
-              .assetsInStorage
-              .asMap()
-              .entries
-              .where((entry) => entry.key % 4 == 0)
-              .map((entry) => entry.value)
-              .toList()
-        };
 
     /// bucket of assets we'll be manipulating, will depend on library mode
     List<AssetEntity> assetBucket = fillAssetBucket(widget.libraryMode);
 
     final List<AssetEntity> deduplicatedAssets =
-        objectBox.deduplicateAssets(results: assetBucket);
+        deduplicateAssets(results: assetBucket);
 
     final List<AssetEntity> sortedSavedAssets =
         sortAssets(assets: deduplicatedAssets, sortOrder: _sortOrder);
 
-    return deduplicatedAssets.isEmpty
-        ? EmptyAssetState()
+    final List<AssetEntity> finalAssets =
+        widget.libraryMode == LibraryMode.recent
+            ? sortedSavedAssets.take(10).toList()
+            : sortedSavedAssets;
+
+    return finalAssets.isEmpty
+        ? EmptyAssetState(
+            message: getEmptyMessage(widget.libraryMode),
+          )
         : Container(
             padding: const EdgeInsets.symmetric(horizontal: 300),
             color: theme.surface,
@@ -101,9 +111,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                   crossAxisCount: 3,
                                   crossAxisSpacing: 10,
                                   mainAxisSpacing: 10),
-                          itemCount: sortedSavedAssets.length,
+                          itemCount: finalAssets.length,
                           itemBuilder: (context, index) {
-                            return AssetCard(asset: sortedSavedAssets[index]);
+                            return AssetCard(asset: finalAssets[index]);
                           })),
                 ],
               ),
