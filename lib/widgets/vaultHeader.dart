@@ -29,17 +29,12 @@ class VaultHeader extends StatelessWidget {
             ),
           ),
           Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-            FilterPill(
-              filterIcon: Icon(Icons.filter),
-              filterText: 'Semantic Filter',
-              onFilter: () {},
-            ),
             SizedBox(
               width: 10,
             ),
             FilterPill(
                 filterText: 'Sort',
-                onFilter: () {},
+                onFilter: (value) {},
                 filterIcon: Icon(Icons.sort))
           ])
         ],
