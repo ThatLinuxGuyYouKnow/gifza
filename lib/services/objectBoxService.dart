@@ -61,9 +61,9 @@ class ObjectBoxService {
         .whereType<AssetEntity>()
         .toList();
 
-    return deduplicate ? deduplicateAssets(results: filtered) : filtered;
+    return deduplicate ? deduplicateAssets(assets: filtered) : filtered;
   }
 
   List<AssetEntity> get assetsInStorage =>
-      deduplicateAssets(results: box.getAll());
+      deduplicateAssets(assets: box.getAll());
 }

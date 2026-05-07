@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gifza/models/asset_entity.dart';
 import 'package:gifza/services/objectBoxService.dart';
+import 'package:gifza/utils/deduplicateAssets.dart';
 import 'package:gifza/widgets/assetCard.dart';
 import 'package:gifza/widgets/customPainter.dart';
 import 'package:provider/provider.dart';
@@ -11,13 +12,10 @@ class HomeLibrarySubsection extends StatelessWidget {
   Widget build(BuildContext context) {
     final _objectBox = context.read<ObjectBoxService>();
 
-    // only display 4(max) at a time, we don't want to render too many images here, users can view all their images in their Library
-    List<AssetEntity> _assets = _objectBox.assetsInStorage
-        .asMap()
-        .entries
-        .where((entry) => entry.key % 4 == 0)
-        .map((entry) => entry.value)
-        .toList();
+    // only display 3(max) at a time, we don't want to render too many images here, users can view all their images in their Library
+    List<AssetEntity> _assets =
+        deduplicateAssets(assets: _objectBox.assetsInStorage).take(3).toList();
+
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 80),
       child: _assets.isEmpty
