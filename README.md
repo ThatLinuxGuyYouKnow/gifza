@@ -94,7 +94,7 @@ Embeddings are stored in ObjectBox as key-value pairs alongside asset metadata. 
 
 Heres a pretty good visualization I made with Manim
 
-![manim visualization](media/videos/vector_points/480p15/PointsInMultiDim.mp4)
+![manim visualization](./media/videos/vector_points/480p15/PointsInMultiDim.mp4)
 
 ### On-Device Inference
 
