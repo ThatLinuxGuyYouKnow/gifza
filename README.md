@@ -100,12 +100,12 @@ Heres a pretty good visualization I made with Manim
 
 All inference runs locally. Both MobileCLIP encoders were converted from PyTorch to ExecuTorch (.pte) format for mobile execution. This enables:
 
-    Fully offline retrieval
-    Low-latency inference
-    Private, local asset indexing
-    Zero external API dependencies
+- Fully offline retrieval
+- Low-latency inference
+- Private, local asset indexing
+- Zero external API dependencies
 
-But converting to Executorch also brought about a problem, tokenization! before generating text embeddings, we need to first tokenize + pad the query, but we could not trace the tokenizer and pack it into .pte convert model, the solution to this was to download the models tokenizer.json and then use [the dart sentencepice package](https://pub.dev/packages/dart_sentencepiece_tokenizer) for BPE tokenization.
+But converting to Executorch also brought about a problem, tokenization! before generating text embeddings, we need to first tokenize + pad the query(or annotation), but we could not trace the tokenizer and pack it into .pte convert model, the solution to this was to download the models tokenizer.json and then use [the dart sentencepice package](https://pub.dev/packages/dart_sentencepiece_tokenizer) for BPE tokenization.
 
 
 ### Challenges
