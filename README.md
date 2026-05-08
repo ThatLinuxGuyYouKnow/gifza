@@ -111,9 +111,9 @@ But converting to Executorch also brought about a problem, tokenization! before 
 ### Challenges
 Some of the more interesting engineering hurdles included:
 
-    Splitting MobileCLIP into separate, deployable encoders
-    Achieving reasonable inference latency for the text encoder on mobile(still a challenge!!)
-    Converting PyTorch models to ExecuTorch without losing accuracy
-    Handling unsupported tokenizer tracing and implementing manual BPE
-    Maintaining embedding consistency across image and text modalities
-    Integrating ANN search smoothly with ObjectBox
+- Splitting MobileCLIP into separate, deployable encoders
+- Achieving reasonable inference latency for the text encoder on mobile(still a challenge!!)
+- Converting PyTorch models to ExecuTorch without losing accuracy
+- Handling unsupported tokenizer tracing and implementing manual BPE
+- Maintaining embedding consistency across image and text modalities
+- Integrating ANN search smoothly with ObjectBox
