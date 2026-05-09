@@ -1,4 +1,4 @@
-# 🎞️ GIFZA
+# GIFZA
 ![Strict Asian Obama](https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExb2pub3V6bjRraXE5a2wyc2J6MXF1OTk2NndjeDliemt2bjhia2l5YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MUR7zOhXhFoSvq0Rf6/giphy.gif)
 
 <p align="center">
@@ -9,9 +9,9 @@
 
 ## Why?
 
-Have you ever struggled to find that perfect sticker or GIF for a group chat? Or a selfie you took on a trip a few years ago? Well I have. That is why I built GIFZA.
+Have you ever struggled to find that perfect sticker or GIF for a group chat? Or that selfie you took with your besties on a trip a few years ago? Well I have. That is why I built GIFZA.
 
-GIFZA (GIF ZAH) is a local-first semantic search engine for visual assets. Upload an image, sticker, or GIF, annotate it naturally, and retrieve it later using meaning instead of exact filenames or manual tags.
+GIFZA (GIF - ZAH) is a local-first semantic search engine for visual assets. Upload an image, sticker, or GIF, annotate it naturally, and retrieve it later using meaning instead of exact filenames or manual tags.
 
 Searches like:
 - `"sad cat staring into space"`
@@ -89,8 +89,17 @@ GIFZA uses Apple's **MobileCLIP-S1** model, split into separate image and text e
 Both image and text modalities exist in the same latent vector space. This enables zero-shot cross-modal retrieval without requiring paired training data at inference time.
 
 
-Vector Storage & Retrieval
+## Vector Storage & Retrieval
+
 Embeddings are stored in ObjectBox as key-value pairs alongside asset metadata. On search, the query text is embedded, and ObjectBox performs native ANN similarity search to return the closest image vectors.
+
+
+So a typical storage would look something like:
+
+Image of a cat => Image location on users file system( we do not duplicate their assets)
+'My cat'(Users annotation) => Same Image location
+
+This means that even if the query does not match the image embedings, it will at least match the annotations embedding.
 
 Heres a pretty good visualization I made with Manim
 
@@ -107,6 +116,37 @@ All inference runs locally. Both MobileCLIP encoders were converted from PyTorch
 
 But converting to Executorch also brought about a problem, tokenization! before generating text embeddings, we need to first tokenize + pad the query(or annotation), but we could not trace the tokenizer and pack it into .pte convert model, the solution to this was to download the models tokenizer.json and then use [the dart sentencepice package](https://pub.dev/packages/dart_sentencepiece_tokenizer) for BPE tokenization.
 
+### Stack
+
+- Flutter
+- ObjectBox
+- Executorch
+- [Apple MobileCLIP S1 OpenCLIP](https://huggingface.co/apple/MobileCLIP-S1-OpenCLIP)
+
+
+### Want to try it out?
+
+First, run the install script at the project root
+
+``` bash
+chmod +x install.sh
+./install.sh
+```
+
+and then run the conversion script
+
+```python
+python3 download_and_convert.py
+```
+
+Run the app!
+
+```bash
+flutter run --release
+```
+
+PS: release mode gives us a little better inference performance
+
 
 ### Challenges
 Some of the more interesting engineering hurdles included:
@@ -117,3 +157,8 @@ Some of the more interesting engineering hurdles included:
 - Handling unsupported tokenizer tracing and implementing manual BPE
 - Maintaining embedding consistency across image and text modalities
 - Integrating ANN search smoothly with ObjectBox
+
+### Feedback and Contributions
+
+Anything you want me to know? Improvements I should make? You're welcome to file a PR or open an issue!
+
