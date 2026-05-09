@@ -46,3 +46,6 @@ app.*.map.json
 
 # ML model files (large binary assets)
 assets/models/*.pte
+
+# Python scripts
+vector_points.py
