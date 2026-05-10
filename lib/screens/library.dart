@@ -53,11 +53,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
     /// bucket of assets we'll be manipulating, will depend on library mode
     List<AssetEntity> assetBucket = fillAssetBucket(widget.libraryMode);
 
-    final List<AssetEntity> deduplicatedAssets =
-        deduplicateAssets(assets: assetBucket);
-
     final List<AssetEntity> sortedSavedAssets =
-        sortAssets(assets: deduplicatedAssets, sortOrder: _sortOrder);
+        sortAssets(assets: assetBucket, sortOrder: _sortOrder);
 
     final List<AssetEntity> finalAssets =
         widget.libraryMode == LibraryMode.recent
