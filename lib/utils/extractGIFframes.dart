@@ -13,7 +13,7 @@ extractGIFframes({required Uint8List rawGIFbytes, int maxFrames = 3}) {
   final int totalFrames = decodedGIF.numFrames;
 //if its a small / short duration gif with total frames less than or equal to our maxFrames, we'll just return and subsequently embed everything
   if (totalFrames <= maxFrames) {
-    for (var i = 0; i < maxFrames; i++) {
+    for (var i = 0; i < totalFrames; i++) {
       final frame = decodedGIF.frames[i];
 
       framesToReturn.add(img.encodeJpg(frame));
@@ -28,4 +28,5 @@ extractGIFframes({required Uint8List rawGIFbytes, int maxFrames = 3}) {
       framesToReturn.add(img.encodeJpg(frame));
     }
   }
+  return framesToReturn;
 }
