@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gifza/models/asset_model.dart';
 import 'package:gifza/providers/assetProvider.dart';
 import 'package:gifza/services/embeddingService.dart';
 import 'package:gifza/services/objectBoxService.dart';
 
 import 'package:gifza/services/tokenizerService.dart';
+import 'package:gifza/utils/extractGIFframes.dart';
 import 'package:gifza/utils/pickAssetfromFiles.dart';
 import 'package:gifza/utils/preprocessImage.dart';
 import 'package:gifza/widgets/alerts/errorAlert.dart';
@@ -161,86 +163,106 @@ class _UploadAssetModalState extends State<UploadAssetModal> {
               onTap: (_isIndexing == true || assetProvider.asset == null)
                   ? null
                   : () async {
-                      setState(() {
-                        _isIndexing = true;
-                      });
+                      setState(() => _isIndexing = true);
 
-                      final imagePipeline = () async {
-                        if (kDebugMode) {
-                          print('starting image embedding');
-                        }
-                        try {
-                          final imageTensorFuture = compute(
-                              preprocessImage, assetProvider.asset!.assetBytes);
+                      try {
+                        // 1. Kick off text pipeline (if annotation exists)
+                        final textFuture = annotationText != null
+                            ? embedding.generateEmbeddings(
+                                tokens: tokenizer.tokenize(annotationText!),
+                                objectType: ObjectType.text,
+                              )
+                            : Future<List<double>?>.value(null);
 
-                          final result = await embedding.generateEmbeddings(
-                              assetType: AssetType.image,
-                              imageTensor: await imageTensorFuture);
+                        // 2. Determine if the asset is a GIF
+                        final isGif =
+                            assetProvider.asset!.assetType == AssetType.gif;
+                        final List<Uint8List> frames = isGif
+                            ? extractGIFframes(
+                                rawGIFbytes: assetProvider.asset!.assetBytes)
+                            : [
+                                assetProvider.asset!.assetBytes
+                              ]; // treat static image as single frame
 
-                          if (kDebugMode) {
-                            print('all done with image embedding!');
+                        // 3. Preprocess all frames in parallel (using compute)
+                        final List<Future<Float32List>> preprocessFutures =
+                            frames
+                                .map(
+                                  (frameBytes) =>
+                                      compute(preprocessImage, frameBytes),
+                                )
+                                .toList();
+
+                        final List<Float32List> processedFrames =
+                            await Future.wait(preprocessFutures);
+
+                        // 4. Run embedding on all processed frames
+                        final List<Future<List<double>?>> embedFutures =
+                            processedFrames
+                                .map(
+                                  (tensor) => embedding.generateEmbeddings(
+                                    objectType: ObjectType.image,
+                                    imageTensor: tensor,
+                                  ),
+                                )
+                                .toList();
+
+                        final List<List<double>?> frameEmbeddings =
+                            await Future.wait(embedFutures);
+
+                        // 5. Average frame embeddings into a single GIF embedding (or just take the single one for images)
+                        List<double>? imageEmbedding;
+                        if (frameEmbeddings.length == 1) {
+                          imageEmbedding = frameEmbeddings.first;
+                        } else {
+                          // Filter out any nulls, then element-wise average
+                          final validEmbeddings = frameEmbeddings
+                              .whereType<List<double>>()
+                              .toList();
+                          if (validEmbeddings.isEmpty) {
+                            throw Exception('All frame embeddings failed');
                           }
-                          return result;
-                        } catch (e) {
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return ErrorAlert(
-                                  errorTitle: 'Error Occured $e',
-                                );
-                              });
+                          final embeddingLength = validEmbeddings.first.length;
+                          final averaged =
+                              List<double>.filled(embeddingLength, 0.0);
+                          for (final emb in validEmbeddings) {
+                            for (int i = 0; i < embeddingLength; i++) {
+                              averaged[i] += emb[i];
+                            }
+                          }
+                          for (int i = 0; i < embeddingLength; i++) {
+                            averaged[i] /= validEmbeddings.length;
+                          }
+                          imageEmbedding = averaged;
                         }
-                      }();
 
-                      final textPipeline = (annotationText != null)
-                          ? () async {
-                              if (kDebugMode) {
-                                print('starting text embedding');
-                              }
+                        // 6. Await text embedding (already running in parallel)
+                        final textEmbedding = await textFuture;
 
-                              final tokens =
-                                  tokenizer.tokenize(annotationText ?? '');
-                              if (kDebugMode) {
-                                print('finished tokenizing');
-                              }
-                              final result = await embedding.generateEmbeddings(
-                                  tokens: tokens, assetType: AssetType.text);
-
-                              if (kDebugMode) {
-                                print('all done with image embedding!');
-                              }
-
-                              return result;
-                            }()
-                          : null;
-
-                      final textEmbeddings = await textPipeline;
-                      final imageEmbeddings = await imagePipeline;
-                      if (annotationText != null) {
-                        objectBox.storeAsset(
-                            assetPath: assetProvider.asset!.assetPath,
-                            imageEmbedding: imageEmbeddings!,
-                            annotationEmbedding: textEmbeddings);
-                      } else {
+                        // 7. Store
                         objectBox.storeAsset(
                           assetPath: assetProvider.asset!.assetPath,
-                          imageEmbedding: imageEmbeddings!,
+                          imageEmbedding: imageEmbedding!,
+                          annotationEmbedding: textEmbedding,
                         );
-                      }
-                      setState(() {
-                        _isIndexing = false;
-                      });
 
-                      assetProvider.clear();
-                      Navigator.pop(context);
-
-                      showDialog(
+                        // 8. Wrap up
+                        assetProvider.clear();
+                        Navigator.pop(context);
+                        showDialog(
                           context: context,
-                          builder: (BuildContext context) {
-                            return SuccesfulIndexAlert(
-                              annotation: annotationText,
-                            );
-                          });
+                          builder: (_) =>
+                              SuccesfulIndexAlert(annotation: annotationText),
+                        );
+                      } catch (e) {
+                        showDialog(
+                          context: context,
+                          builder: (_) =>
+                              ErrorAlert(errorTitle: 'Indexing failed: $e'),
+                        );
+                      } finally {
+                        if (mounted) setState(() => _isIndexing = false);
+                      }
                     },
               child: Container(
                 height: 80,
