@@ -7,16 +7,24 @@ import 'package:gifza/widgets/alerts/loadingAlert.dart';
 import 'package:gifza/widgets/alerts/successfulAlert.dart';
 import 'package:provider/provider.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  double? _localTolerance;
+  int? _localQueryMax;
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
     final box = context.watch<ObjectBoxService>();
-    final prefs = context.watch<UserPreferenceService>();
-    final preferencesPercentage =
-        prefs.getTolerancePref(toleranceType: ToleranceType.percentage);
-    final maxQueries = prefs.getMaxResultsPerQuery();
+    final prefs = context.read<UserPreferenceService>();
+
+    _localTolerance ??=
+        prefs.getTolerancePref(toleranceType: ToleranceType.percentage) / 100;
+    _localQueryMax ??= prefs.getMaxResultsPerQuery();
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 300),
       child: Column(
@@ -55,28 +63,45 @@ class SettingsScreen extends StatelessWidget {
           ),
           SettingsPod(widgetChildren: [
             Container(
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
                 child: SettingsSliderTile(
+                  onChangedEnd: (value) =>
+                      prefs.storeTolerancePref(toleranceSliderValue: value),
                   isPercentageType: true,
                   title: 'Search Tolerance',
-                  subtitle:
-                      "Higher = Broader Results, Lower = Closer and Stricter matches",
-                  value: preferencesPercentage,
+                  subtitle: "Higher = Broader Results, Lower = Closer matches",
+                  value: _localTolerance!,
+                  min: 0.0,
+                  max: 1.0,
+                  leftLabel: 'Broad',
+                  rightLabel: 'Strict',
                   onChanged: (value) {
-                    prefs.storeTolerancePref(toleranceInPercentage: value);
+                    setState(() {
+                      _localTolerance = value;
+                    });
                   },
                 )),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
               child: SettingsSliderTile(
+                onChangedEnd: (value) =>
+                    prefs.storeMaxResultsPerQuery(maxResults: value.round()),
                 isPercentageType: false,
                 title: 'Max Results Per Query',
                 subtitle:
                     'Maximum number of results to render on a single query',
-                value: (maxQueries / 100).toDouble(),
+                value: _localQueryMax!.toDouble() <= 20
+                    ? _localQueryMax!.toDouble()
+                    : 20,
+                min: 2.0, // Minimum 10 results
+                max: 20.0, // Maximum 100 results
+                leftLabel: '2',
+                rightLabel: '20',
                 onChanged: (value) {
-                  prefs.storeMaxResultsPerQuery(
-                      maxResults: value.round().toInt());
+                  setState(() {
+                    _localQueryMax = value.round();
+                  });
                 },
               ),
             )
@@ -141,7 +166,6 @@ class SettingsPod extends StatelessWidget {
   const SettingsPod({super.key, required this.widgetChildren});
 
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
           border: Border.all(color: Colors.white),
@@ -167,26 +191,34 @@ class SettingsPod extends StatelessWidget {
   }
 }
 
-class SettingsSliderTile extends StatefulWidget {
+class SettingsSliderTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final double value;
   final ValueChanged<double> onChanged;
-  bool isPercentageType;
+  final ValueChanged<double> onChangedEnd;
+  final bool isPercentageType;
 
-  SettingsSliderTile(
-      {super.key,
-      required this.title,
-      required this.subtitle,
-      required this.value,
-      required this.onChanged,
-      this.isPercentageType = false});
+  // Added ranges and labels to make the slider reusable!
+  final double min;
+  final double max;
+  final String leftLabel;
+  final String rightLabel;
 
-  @override
-  State<SettingsSliderTile> createState() => _SettingsSliderTileState();
-}
+  const SettingsSliderTile({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+    this.isPercentageType = false,
+    this.min = 0.0,
+    this.max = 1.0,
+    this.leftLabel = '',
+    this.rightLabel = '',
+    required this.onChangedEnd,
+  });
 
-class _SettingsSliderTileState extends State<SettingsSliderTile> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
@@ -195,37 +227,41 @@ class _SettingsSliderTileState extends State<SettingsSliderTile> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(widget.title,
-                  style: TextStyle(
+              Text(title,
+                  style: const TextStyle(
                       fontFamily: 'Jakarta',
                       fontSize: 16,
                       fontWeight: FontWeight.w600)),
               Text(
-                  '${(widget.value * 100).round()}${widget.isPercentageType ? '%' : ''}',
+                  isPercentageType
+                      ? '${(value * 100).round()}%'
+                      : '${value.round()}',
                   style: TextStyle(color: theme.primary))
             ],
           ),
-          SizedBox(height: 4),
-          Text(widget.subtitle,
-              style: TextStyle(fontSize: 12, color: Colors.grey)),
+          const SizedBox(height: 4),
+          Text(subtitle,
+              style: const TextStyle(fontSize: 12, color: Colors.grey)),
           Slider(
-            value: widget.value,
-            onChanged: widget.onChanged,
+            onChangeEnd: onChangedEnd,
+            value: value,
+            min: min,
+            max: max,
+            onChanged: onChanged,
             activeColor: theme.primary,
             inactiveColor: theme.primary.withOpacity(0.2),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Broad', style: TextStyle(fontSize: 11, color: Colors.grey)),
-              Text('Strict',
-                  style: TextStyle(fontSize: 11, color: Colors.grey)),
+              Text(leftLabel,
+                  style: const TextStyle(fontSize: 11, color: Colors.grey)),
+              Text(rightLabel,
+                  style: const TextStyle(fontSize: 11, color: Colors.grey)),
             ],
           )
         ],
@@ -328,7 +364,7 @@ class DeleteAllAssets extends StatelessWidget {
                 ],
               ),
               GestureDetector(
-                onTap: onDeleteAll(),
+                onTap: () => onDeleteAll(),
                 child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
