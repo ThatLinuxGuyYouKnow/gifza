@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:executorch_flutter/executorch_flutter.dart';
 import 'package:flutter/services.dart';
 
-enum AssetType { image, text }
+enum ObjectType { image, text }
 
 class EmbeddingService {
   ExecuTorchModel? _textModel;
@@ -23,7 +23,7 @@ class EmbeddingService {
   Future<List<double>?> generateEmbeddings(
       {List<int>? tokens,
       Float32List? imageTensor,
-      required AssetType assetType}) async {
+      required ObjectType objectType}) async {
     if (_textModel == null) {
       throw Exception('Text model failed to initialize, does it exist?');
     }
@@ -31,7 +31,7 @@ class EmbeddingService {
       throw Exception('Image model failed to initialize, does it exist?');
     }
 
-    if (assetType == AssetType.text) {
+    if (objectType == ObjectType.text) {
       final int32tokens = Int32List.fromList(tokens!);
 
       final inputTensors = TensorData(

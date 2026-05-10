@@ -11,7 +11,10 @@ class AssetProvider extends ChangeNotifier {
     final file = File.files.single;
 
     _asset = AssetModel(
-        assetPath: file.path!, fileName: file.name, assetBytes: file.bytes!);
+        assetPath: file.path!,
+        fileName: file.name,
+        assetBytes: file.bytes!,
+        assetType: file.extension == 'gif' ? AssetType.gif : AssetType.image);
 
     notifyListeners();
   }
