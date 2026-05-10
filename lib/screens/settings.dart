@@ -1,59 +1,350 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
-import 'package:gifza/widgets/settingsTiles.dart';
+import 'package:gifza/services/objectBoxService.dart';
+import 'package:gifza/services/userPreferenceService.dart';
+import 'package:gifza/widgets/alerts/loadingAlert.dart';
+import 'package:gifza/widgets/alerts/successfulAlert.dart';
+import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
-  SettingsScreen({super.key});
+  const SettingsScreen({super.key});
+
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
+    final box = context.watch<ObjectBoxService>();
+    final prefs = context.watch<UserPreferenceService>();
+    final preferencesPercentage =
+        prefs.getTolerancePref(toleranceType: ToleranceType.percentage);
+    final maxQueries = prefs.getMaxResultsPerQuery();
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 300),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 50),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  'Settings',
+                  style: TextStyle(
+                      color: theme.primary,
+                      fontFamily: 'Jakarta',
+                      fontSize: 40,
+                      fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.0),
+                child: Text(
+                  'S E A R C H   T O L E R A N C E',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            ],
+          ),
+          SettingsPod(widgetChildren: [
+            Container(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                child: SettingsSliderTile(
+                  isPercentageType: true,
+                  title: 'Search Tolerance',
+                  subtitle:
+                      "Higher = Broader Results, Lower = Closer and Stricter matches",
+                  value: preferencesPercentage,
+                  onChanged: (value) {
+                    prefs.storeTolerancePref(toleranceInPercentage: value);
+                  },
+                )),
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+              child: SettingsSliderTile(
+                isPercentageType: false,
+                title: 'Max Results Per Query',
+                subtitle:
+                    'Maximum number of results to render on a single query',
+                value: (maxQueries / 100).toDouble(),
+                onChanged: (value) {
+                  prefs.storeMaxResultsPerQuery(
+                      maxResults: value.round().toInt());
+                },
+              ),
+            )
+          ]),
+          Padding(
+            padding: EdgeInsets.only(bottom: 20.0, top: 40),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  'V A U L T   M A N A G E M E N T',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          ReIndexTile(
+              onReIndex: () {},
+              onDeleteOrphaned: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return LoadingAlert();
+                    });
+                final int assetsDeleted = box.prune();
+                Navigator.pop(context);
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return SuccesfulAlert(
+                          successText: 'Pruned $assetsDeleted assets');
+                    });
+              }),
+          SizedBox(
+            height: 30,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.0),
+                child: Text(
+                  'D A N G E R   Z O N E',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            ],
+          ),
+          DeleteAllAssets(onDeleteAll: () {
+            box.deletAllAssets();
+          })
+        ],
+      ),
+    );
+  }
+}
+
+class SettingsPod extends StatelessWidget {
+  final List<Widget> widgetChildren;
+  const SettingsPod({super.key, required this.widgetChildren});
 
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
     return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 300, vertical: 100),
-        color: theme.surface,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Settings',
-              style: TextStyle(
-                  fontFamily: 'Vietnam',
-                  fontSize: 40,
-                  fontWeight: FontWeight.w700),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            SettingsTile(
-                titleText: 'Auto Embed',
-                subtitleText: 'Embed Images as they are uploaded',
-                onRadioToggled: () {}),
-            SizedBox(
-              height: 30,
-            ),
-            SettingsTile(
-                titleText: 'Save Searches',
-                subtitleText: 'Save recent queries for quick searches',
-                onRadioToggled: () {}),
-            SizedBox(
-              height: 30,
-            ),
-            SpecialActionTile(
-              actionText: 'Re-index',
-              titleText: 'Re-index',
-              subtitleText: 'Re-index images',
-              onRadioToggled: () {},
-            ),
-            SizedBox(
-              height: 80,
-            ),
-            Text(
-              'Storage',
-              style: TextStyle(
-                  fontFamily: 'Vietnam',
-                  fontSize: 30,
-                  fontWeight: FontWeight.w700,
-                  color: theme.secondary),
-            ),
-          ],
-        ));
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.white),
+          color: Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          for (int i = 0; i < widgetChildren.length; i++) ...[
+            widgetChildren[i],
+
+            // continue to put a divider after every widget child EXCEPT the very last one
+            if (i < widgetChildren.length - 1) ...[
+              Divider(
+                color: Colors.white,
+              )
+            ]
+          ]
+        ],
+      ),
+    );
+  }
+}
+
+class SettingsSliderTile extends StatefulWidget {
+  final String title;
+  final String subtitle;
+  final double value;
+  final ValueChanged<double> onChanged;
+  bool isPercentageType;
+
+  SettingsSliderTile(
+      {super.key,
+      required this.title,
+      required this.subtitle,
+      required this.value,
+      required this.onChanged,
+      this.isPercentageType = false});
+
+  @override
+  State<SettingsSliderTile> createState() => _SettingsSliderTileState();
+}
+
+class _SettingsSliderTileState extends State<SettingsSliderTile> {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(widget.title,
+                  style: TextStyle(
+                      fontFamily: 'Jakarta',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600)),
+              Text(
+                  '${(widget.value * 100).round()}${widget.isPercentageType ? '%' : ''}',
+                  style: TextStyle(color: theme.primary))
+            ],
+          ),
+          SizedBox(height: 4),
+          Text(widget.subtitle,
+              style: TextStyle(fontSize: 12, color: Colors.grey)),
+          Slider(
+            value: widget.value,
+            onChanged: widget.onChanged,
+            activeColor: theme.primary,
+            inactiveColor: theme.primary.withOpacity(0.2),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Broad', style: TextStyle(fontSize: 11, color: Colors.grey)),
+              Text('Strict',
+                  style: TextStyle(fontSize: 11, color: Colors.grey)),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class ReIndexTile extends StatelessWidget {
+  final VoidCallback onReIndex;
+  final VoidCallback onDeleteOrphaned;
+
+  const ReIndexTile({
+    super.key,
+    required this.onReIndex,
+    required this.onDeleteOrphaned,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.primary.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.primary),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Prune Vault ',
+                      style: TextStyle(
+                          fontFamily: 'Jakarta',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600)),
+                  SizedBox(height: 4),
+                  Text('Remove assets whose files no longer exist',
+                      style: TextStyle(fontSize: 12, color: Colors.grey)),
+                ],
+              ),
+              GestureDetector(
+                onTap: onDeleteOrphaned,
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: theme.primary.withOpacity(0.1)),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text('Prune',
+                      style: TextStyle(
+                          fontFamily: 'Jakarta',
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700)),
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DeleteAllAssets extends StatelessWidget {
+  final Function onDeleteAll;
+
+  const DeleteAllAssets({super.key, required this.onDeleteAll});
+
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.red),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Delete All ',
+                      style: TextStyle(
+                          fontFamily: 'Jakarta',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600)),
+                  SizedBox(height: 4),
+                  Text('Delete all assets in your vault',
+                      style: TextStyle(fontSize: 12, color: Colors.grey)),
+                ],
+              ),
+              GestureDetector(
+                onTap: onDeleteAll(),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.red.withOpacity(0.1)),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text('Nuke',
+                      style: TextStyle(
+                          fontFamily: 'Jakarta',
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700)),
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
