@@ -65,8 +65,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
             : sortedSavedAssets;
 
     return finalAssets.isEmpty
-        ? EmptyAssetState(
-            message: getEmptyMessage(widget.libraryMode),
+        ? Padding(
+            padding: const EdgeInsets.all(100),
+            child: EmptyAssetState(
+              message: getEmptyMessage(widget.libraryMode),
+            ),
           )
         : Container(
             padding: const EdgeInsets.symmetric(horizontal: 300),
