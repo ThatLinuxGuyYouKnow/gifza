@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gifza/providers/screenProvider.dart';
 import 'package:gifza/providers/searchProvider.dart';
-import 'package:gifza/screens/library.dart';
+
 import 'package:gifza/services/embeddingService.dart';
 import 'package:gifza/services/objectBoxService.dart';
 import 'package:gifza/services/tokenizerService.dart';
+import 'package:gifza/services/userPreferenceService.dart';
 import 'package:gifza/widgets/alerts/errorAlert.dart';
 import 'package:gifza/widgets/alerts/loadingAlert.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +27,11 @@ class _GifzaSearchBarState extends State<GifzaSearchBar> {
     final objectBox = context.read<ObjectBoxService>();
     final embeddings = context.read<EmbeddingService>();
     final tokenizer = context.read<ClipTokenizerService>();
+    final pref = context.read<UserPreferenceService>();
+
+    final maxResults = pref.getMaxResultsPerQuery();
+    final tolerance =
+        pref.getTolerancePref(toleranceType: ToleranceType.inRange);
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 250),
       child: Container(
@@ -73,9 +79,12 @@ class _GifzaSearchBarState extends State<GifzaSearchBar> {
                         final queryTokens = tokenizer.tokenize(queryText);
                         final queryEmbedding =
                             await embeddings.generateEmbeddings(
-                                assetType: AssetType.text, tokens: queryTokens);
+                                objectType: ObjectType.text,
+                                tokens: queryTokens);
                         final results = objectBox.findNClosestAssets(
-                            N: 5, queryEmbedding: queryEmbedding!);
+                            N: maxResults,
+                            queryEmbedding: queryEmbedding!,
+                            scoreThreshold: tolerance);
                         searchProvider.updateSearchResults(results: results!);
                         Navigator.pop(context);
                         screenProvider.routeToScreen(
