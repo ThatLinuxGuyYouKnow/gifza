@@ -7,6 +7,7 @@ import 'package:gifza/screens/splashScreen.dart';
 import 'package:gifza/services/embeddingService.dart';
 import 'package:gifza/services/objectBoxService.dart';
 import 'package:gifza/services/tokenizerService.dart';
+import 'package:gifza/services/userPreferenceService.dart';
 import 'package:gifza/themes/theme.dart';
 import 'package:gifza/widgets/appbar.dart';
 import 'package:gifza/providers/screenProvider.dart';
@@ -31,6 +32,7 @@ class _GifzaAppState extends State<GifzaApp> {
   ObjectBoxService? _objectBoxService;
   EmbeddingService? _embeddingService;
   ClipTokenizerService? _clipTokenizerService;
+  UserPreferenceService? _prefs;
 
   @override
   void initState() {
@@ -45,11 +47,14 @@ class _GifzaAppState extends State<GifzaApp> {
 
     final tokenizer = ClipTokenizerService();
 
+    final prefs = UserPreferenceService();
+
     /// initialize everything in parallel
     await Future.wait<void>([
       objectBox.initialize(),
       embeddingService.initialize(),
       tokenizer.init(),
+      prefs.init()
     ]);
 
     if (!mounted) return;
@@ -58,6 +63,7 @@ class _GifzaAppState extends State<GifzaApp> {
       _embeddingService = embeddingService;
       _clipTokenizerService = tokenizer;
       _initialized = true;
+      _prefs = prefs;
     });
   }
 
@@ -76,6 +82,7 @@ class _GifzaAppState extends State<GifzaApp> {
       ),
       Provider<EmbeddingService>.value(value: _embeddingService!),
       Provider<ClipTokenizerService>.value(value: _clipTokenizerService!),
+      Provider<UserPreferenceService>.value(value: _prefs!),
     ], child: MaterialApp(theme: theme, home: HomePage()));
   }
 }
