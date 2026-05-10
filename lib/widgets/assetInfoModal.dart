@@ -7,6 +7,7 @@ class AssetInfoModal extends StatelessWidget {
   final AssetEntity asset;
   const AssetInfoModal({super.key, required this.asset});
 
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
     final bool fileExists = File(asset.content).existsSync();

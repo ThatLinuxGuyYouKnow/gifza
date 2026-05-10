@@ -4,8 +4,8 @@ from executorch.exir import to_edge
 import os
 
 ### This script will download the unified MobileClip S1 model, splice into separate text - image encoders, and place it in the correct directory.
-### You could also modify this script to install S2 => S4(openclip) for better zero shot classification 
-### make sure you run install.sh first!!
+### You could also modify this script to install S2 => S4(openclip) for better zero shot classification, although you'll have to download the correct tokenizer.json file for that specific model 
+### Make sure you run install.sh first!!
 
 OUTPUT_DIR = "assets/models"
 
