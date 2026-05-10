@@ -27,9 +27,9 @@ class _UploadAssetModalState extends State<UploadAssetModal> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final assetProvider = Provider.of<AssetProvider>(context, listen: true);
-    final _tokenizer = context.read<ClipTokenizerService>();
-    final _embedding = context.read<EmbeddingService>();
-    final _objectBox = context.read<ObjectBoxService>();
+    final tokenizer = context.read<ClipTokenizerService>();
+    final embedding = context.read<EmbeddingService>();
+    final objectBox = context.read<ObjectBoxService>();
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
@@ -173,7 +173,7 @@ class _UploadAssetModalState extends State<UploadAssetModal> {
                           final imageTensorFuture = compute(
                               preprocessImage, assetProvider.asset!.assetBytes);
 
-                          final result = await _embedding.generateEmbeddings(
+                          final result = await embedding.generateEmbeddings(
                               assetType: AssetType.image,
                               imageTensor: await imageTensorFuture);
 
@@ -199,12 +199,12 @@ class _UploadAssetModalState extends State<UploadAssetModal> {
                               }
 
                               final tokens =
-                                  _tokenizer.tokenize(annotationText ?? '');
-                              print('finished tokenizing');
-                              final result =
-                                  await _embedding.generateEmbeddings(
-                                      tokens: tokens,
-                                      assetType: AssetType.text);
+                                  tokenizer.tokenize(annotationText ?? '');
+                              if (kDebugMode) {
+                                print('finished tokenizing');
+                              }
+                              final result = await embedding.generateEmbeddings(
+                                  tokens: tokens, assetType: AssetType.text);
 
                               if (kDebugMode) {
                                 print('all done with image embedding!');
@@ -217,12 +217,12 @@ class _UploadAssetModalState extends State<UploadAssetModal> {
                       final textEmbeddings = await textPipeline;
                       final imageEmbeddings = await imagePipeline;
                       if (annotationText != null) {
-                        _objectBox.storeAsset(
+                        objectBox.storeAsset(
                             assetPath: assetProvider.asset!.assetPath,
                             imageEmbedding: imageEmbeddings!,
                             annotationEmbedding: textEmbeddings);
                       } else {
-                        _objectBox.storeAsset(
+                        objectBox.storeAsset(
                           assetPath: assetProvider.asset!.assetPath,
                           imageEmbedding: imageEmbeddings!,
                         );
