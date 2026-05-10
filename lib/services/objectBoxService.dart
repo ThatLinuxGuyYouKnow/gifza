@@ -1,3 +1,6 @@
+import 'dart:ffi';
+import 'dart:io';
+
 import 'package:gifza/models/asset_entity.dart';
 import 'package:gifza/services/objectBoxSetup.dart';
 import 'package:gifza/utils/deduplicateAssets.dart';
@@ -66,4 +69,30 @@ class ObjectBoxService {
 
   List<AssetEntity> get assetsInStorage =>
       deduplicateAssets(assets: box.getAll());
+
+  deletAllAssets() {
+    box.removeAll();
+  }
+
+  deleteAsset({required List<int> assetIDs}) {
+    box.removeMany(assetIDs);
+  }
+
+  /// cycle through assets in storage and delete embeddings if the associated file (asset.content) / file Path no longer exists
+  prune() {
+    final allAssets = box.getAll();
+
+    if (allAssets.isNotEmpty) {
+      List<int> assetsToNuke = [];
+      for (final AssetEntity asset in allAssets) {
+        if (!File(asset.content).existsSync()) {
+          assetsToNuke.add(asset.id);
+        }
+      }
+
+      deleteAsset(assetIDs: assetsToNuke);
+    } else {
+      return 0;
+    }
+  }
 }
