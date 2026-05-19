@@ -17,6 +17,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   double? _localTolerance;
   int? _localQueryMax;
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
     final box = context.watch<ObjectBoxService>();
@@ -165,6 +166,7 @@ class SettingsPod extends StatelessWidget {
   final List<Widget> widgetChildren;
   const SettingsPod({super.key, required this.widgetChildren});
 
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -335,7 +337,7 @@ class DeleteAllAssets extends StatelessWidget {
   final Function onDeleteAll;
 
   const DeleteAllAssets({super.key, required this.onDeleteAll});
-
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(

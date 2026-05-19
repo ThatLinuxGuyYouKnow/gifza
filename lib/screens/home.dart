@@ -8,7 +8,7 @@ import 'package:gifza/widgets/vaultHeader.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 300),

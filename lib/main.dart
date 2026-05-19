@@ -20,7 +20,7 @@ void main() async {
 }
 
 class GifzaApp extends StatefulWidget {
-  GifzaApp({super.key});
+  const GifzaApp({super.key});
 
   @override
   State<GifzaApp> createState() => _GifzaAppState();
@@ -67,6 +67,7 @@ class _GifzaAppState extends State<GifzaApp> {
     });
   }
 
+  @override
   Widget build(BuildContext context) {
     if (!_initialized) {
       return MaterialApp(theme: theme, home: SplashScreen());
