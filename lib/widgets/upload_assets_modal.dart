@@ -1,17 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gifza/models/asset_model.dart';
-import 'package:gifza/providers/assetProvider.dart';
-import 'package:gifza/services/embeddingService.dart';
-import 'package:gifza/services/objectBoxService.dart';
+import 'package:gifza/providers/asset_provider.dart';
+import 'package:gifza/services/embedding_service.dart';
+import 'package:gifza/services/object_box_service.dart';
 
-import 'package:gifza/services/tokenizerService.dart';
-import 'package:gifza/utils/extractGIFframes.dart';
-import 'package:gifza/utils/pickAssetfromFiles.dart';
-import 'package:gifza/utils/preprocessImage.dart';
-import 'package:gifza/widgets/alerts/errorAlert.dart';
+import 'package:gifza/services/tokenizer_service.dart';
+import 'package:gifza/utils/extract_gif_frames.dart';
+import 'package:gifza/utils/pick_asset_from_files.dart';
+import 'package:gifza/utils/preprocess_image.dart';
+import 'package:gifza/widgets/alerts/error_alert.dart';
 
-import 'package:gifza/widgets/alerts/sucessfulIndex.dart';
+import 'package:gifza/widgets/alerts/sucessfull_index.dart';
 import 'package:provider/provider.dart';
 
 class UploadAssetModal extends StatefulWidget {
@@ -65,7 +65,7 @@ class _UploadAssetModalState extends State<UploadAssetModal> {
                   ? () async {
                       final picked = await pickAsset();
                       if (picked != null) {
-                        assetProvider.loadInAsset(File: picked);
+                        assetProvider.loadInAsset(filePicked: picked);
                       }
                     }
                   : null,

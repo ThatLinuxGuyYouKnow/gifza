@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:executorch_flutter/executorch_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 enum ObjectType { image, text }
@@ -31,6 +32,8 @@ class EmbeddingService {
       throw Exception('Image model failed to initialize, does it exist?');
     }
 
+    final stopwatch = Stopwatch()..start();
+
     if (objectType == ObjectType.text) {
       final int32tokens = Int32List.fromList(tokens!);
 
@@ -50,7 +53,9 @@ class EmbeddingService {
 
           final rawEmbeddings = floatList.toList();
 
-          return _normalize(rawEmbeddings);
+          final result = _normalize(rawEmbeddings);
+          debugPrint('[EmbeddingService] Text embedding generated in ${stopwatch.elapsedMilliseconds}ms');
+          return result;
         }
       } catch (error) {
         throw Exception('Failed to generate Embeddings');
@@ -63,8 +68,10 @@ class EmbeddingService {
               imageTensor.lengthInBytes));
 
       final imageOutput = await _imageModel!.forward([inputTensors]);
-      return _normalize(
+      final result = _normalize(
           Float32List.sublistView(imageOutput.first.data).toList());
+      debugPrint('[EmbeddingService] Image embedding generated in ${stopwatch.elapsedMilliseconds}ms');
+      return result;
     }
     return null;
   }

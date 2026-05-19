@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gifza/models/asset_entity.dart';
-import 'package:gifza/widgets/assetInfoModal.dart';
+import 'package:gifza/widgets/asset_info_modal.dart';
 
 class AssetCard extends StatelessWidget {
   final AssetEntity asset;
-  AssetCard({super.key, required this.asset});
+  const AssetCard({super.key, required this.asset});
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
     return ClipRRect(

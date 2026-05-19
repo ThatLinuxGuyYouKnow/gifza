@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:gifza/services/userPreferenceService.dart';
+import 'package:gifza/services/user_preference_service.dart';
 
 void main() {
   late UserPreferenceService prefs;

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gifza/models/asset_entity.dart';
-import 'package:gifza/providers/screenProvider.dart';
-import 'package:gifza/providers/searchProvider.dart';
+import 'package:gifza/providers/screen_provider.dart';
+import 'package:gifza/providers/search_provider.dart';
 
-import 'package:gifza/services/objectBoxService.dart';
-import 'package:gifza/utils/deduplicateAssets.dart';
-import 'package:gifza/utils/sortAssetsByDateIndexed.dart';
-import 'package:gifza/widgets/assetCard.dart';
-import 'package:gifza/widgets/filterPills.dart';
-import 'package:gifza/widgets/homeLibrarySubsection.dart';
+import 'package:gifza/services/object_box_service.dart';
+
+import 'package:gifza/utils/sort_assets_by_date_indexed.dart';
+import 'package:gifza/widgets/asset_card.dart';
+import 'package:gifza/widgets/filter_pills.dart';
+import 'package:gifza/widgets/home_library_subsection.dart';
 import 'package:provider/provider.dart';
 
 /// re usable library component, because, search, full library and recent assets all very similar layout / functionality, we just use

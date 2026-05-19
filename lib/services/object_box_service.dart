@@ -1,8 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:gifza/models/asset_entity.dart';
-import 'package:gifza/services/objectBoxSetup.dart';
-import 'package:gifza/utils/deduplicateAssets.dart';
+import 'package:gifza/services/object_box_setup.dart';
+import 'package:gifza/utils/deduplicate_assets.dart';
 import '../objectbox.g.dart';
 
 class ObjectBoxService {
@@ -34,7 +35,9 @@ class ObjectBoxService {
     }
     box.put(newAsset);
 
-    print('Stored succesfully');
+    if (kDebugMode) {
+      print('Stored succesfully');
+    }
   }
 
   /// function for getting the closest N items to the query embedding.

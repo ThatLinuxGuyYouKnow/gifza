@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gifza/models/asset_entity.dart';
-import 'package:gifza/services/objectBoxService.dart';
-import 'package:gifza/utils/deduplicateAssets.dart';
-import 'package:gifza/widgets/assetCard.dart';
-import 'package:gifza/widgets/customPainter.dart';
+import 'package:gifza/services/object_box_service.dart';
+import 'package:gifza/utils/deduplicate_assets.dart';
+import 'package:gifza/widgets/asset_card.dart';
+import 'package:gifza/widgets/custom_painter.dart';
 import 'package:provider/provider.dart';
 
 class HomeLibrarySubsection extends StatelessWidget {

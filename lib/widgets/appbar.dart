@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gifza/providers/screenProvider.dart';
+import 'package:gifza/providers/screen_provider.dart';
 
 import 'package:provider/provider.dart';
 

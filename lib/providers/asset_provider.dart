@@ -7,8 +7,8 @@ class AssetProvider extends ChangeNotifier {
 
   AssetModel? get asset => _asset;
 
-  loadInAsset({required FilePickerResult File}) {
-    final file = File.files.single;
+  loadInAsset({required FilePickerResult filePicked}) {
+    final file = filePicked.files.single;
 
     _asset = AssetModel(
         assetPath: file.path!,

@@ -1,10 +1,8 @@
-// ignore_for_file: non_constant_identifier_names
-
 import 'package:flutter/material.dart';
-import 'package:gifza/services/objectBoxService.dart';
-import 'package:gifza/services/userPreferenceService.dart';
-import 'package:gifza/widgets/alerts/loadingAlert.dart';
-import 'package:gifza/widgets/alerts/successfulAlert.dart';
+import 'package:gifza/services/object_box_service.dart';
+import 'package:gifza/services/user_preference_service.dart';
+import 'package:gifza/widgets/alerts/loading_alert.dart';
+import 'package:gifza/widgets/alerts/successfull_alert.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {

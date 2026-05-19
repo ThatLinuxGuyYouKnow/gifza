@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:gifza/widgets/actionRow.dart';
-import 'package:gifza/widgets/headerTexts.dart';
-import 'package:gifza/widgets/homeLibrarySubsection.dart';
+import 'package:gifza/widgets/action_row.dart';
+import 'package:gifza/widgets/header_texts.dart';
+import 'package:gifza/widgets/home_library_subsection.dart';
 import 'package:gifza/widgets/searchbar.dart';
-import 'package:gifza/widgets/vaultHeader.dart';
+import 'package:gifza/widgets/vault_header.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

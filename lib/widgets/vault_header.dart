@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gifza/widgets/filterPills.dart';
+import 'package:gifza/widgets/filter_pills.dart';
 
 class VaultHeader extends StatelessWidget {
-  VaultHeader({super.key});
-
+  const VaultHeader({super.key});
+  @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

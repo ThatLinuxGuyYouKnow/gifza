@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gifza/widgets/actionCards.dart';
+import 'package:gifza/widgets/action_cards.dart';
 
 class ActionRow extends StatelessWidget {
   const ActionRow({super.key});

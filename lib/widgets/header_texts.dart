@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HomeScreenHeader extends StatelessWidget {
-  HomeScreenHeader({super.key});
+  const HomeScreenHeader({super.key});
 
   Widget build(BuildContext context) {
     return Container(
