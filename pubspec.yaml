@@ -32,7 +32,7 @@ dev_dependencies:
 hooks:
   user_defines:
     executorch_flutter:
-      debug: true               
+      debug: false              
       build_mode: "prebuilt"     
   
       backends:
